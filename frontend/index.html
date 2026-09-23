@@ -7,16 +7,32 @@
     body { font-family: sans-serif; margin: 0; background: #1c1917; color: #f5f5f4; }
     header { display: flex; gap: 12px; align-items: center; padding: 12px 20px; background: #44403c; }
     main { max-width: 760px; margin: 20px auto; padding: 0 12px; }
-    input, button { padding: 8px; margin-right: 8px; }
+    input, button, select { padding: 8px; margin-right: 8px; }
+    button { cursor: pointer; }
     .alarm { color: #fca5a5; } .ok { color: #86efac; }
     #live { min-height: 1.4em; }
     table { width: 100%; border-collapse: collapse; }
     td, th { border-bottom: 1px solid #57534e; padding: 6px; text-align: left; }
+    nav button { background: transparent; color: #f5f5f4; border: 1px solid #78716c; border-radius: 4px; }
+    nav button.active { background: #78716c; }
+    .tag { font-size: 12px; padding: 1px 6px; border-radius: 8px; background: #1e3a8a; margin-left: 6px; }
+    .task-card { border: 1px solid #57534e; border-radius: 6px; padding: 10px 12px; margin: 8px 0; }
+    .task-card.overdue { border-color: #b91c1c; background: #2a1717; }
+    .muted { color: #a8a29e; font-size: 13px; }
+    a.link { color: #93c5fd; cursor: pointer; text-decoration: underline; }
+    tr.flash { animation: flash 2s; }
+    @keyframes flash { 0%, 60% { background: #854d0e; } 100% { background: transparent; } }
+    h2 { font-size: 16px; margin: 18px 0 6px; }
+    h2.overdue { color: #fca5a5; }
   </style>
 </head>
 <body>
   <header>
     <strong>矿井瓦斯班测台</strong>
+    <nav>
+      <button id="nav-readings" class="active">班测</button>
+      <button id="nav-tasks">复测任务</button>
+    </nav>
     <span id="who"></span>
     <button id="out" hidden>退出</button>
   </header>
@@ -28,14 +44,31 @@
       <button id="go">登录</button>
       <p>gasman / gas123456 可上报；viewer / view123456 只能看</p>
     </section>
+
     <section id="app" hidden>
-      <p id="live">等待推送</p>
-      <form id="form">
-        <input id="site" placeholder="测点" />
-        <input id="ch4" type="number" step="0.01" placeholder="甲烷 %" />
-        <button>上报</button>
-      </form>
-      <table><thead><tr><th>测点</th><th>甲烷 %</th><th>状态</th><th>说明</th></tr></thead><tbody id="rows"></tbody></table>
+      <section id="view-readings">
+        <p id="live">等待推送</p>
+        <form id="form">
+          <input id="site" placeholder="测点" />
+          <input id="ch4" type="number" step="0.01" placeholder="甲烷 %" />
+          <button>上报</button>
+        </form>
+        <table>
+          <thead><tr><th>编号</th><th>测点</th><th>甲烷 %</th><th>状态</th><th>说明</th><th id="th-actions">操作</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </section>
+
+      <section id="view-tasks" hidden>
+        <p class="muted">报警行可拉起复测任务，任务自带截止时刻；逾期未复测进入逾期栏，逾期后不能再提交。</p>
+        <p id="task-msg" class="muted"></p>
+        <h2>待复测</h2>
+        <div id="tasks-open"><p class="muted">暂无</p></div>
+        <h2 class="overdue">逾期栏</h2>
+        <div id="tasks-overdue"><p class="muted">暂无</p></div>
+        <h2>已完成</h2>
+        <div id="tasks-done"><p class="muted">暂无</p></div>
+      </section>
     </section>
   </main>
   <script src="/app.js"></script>
